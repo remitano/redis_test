@@ -154,7 +154,7 @@ module RedisTest
       return false unless linux?
       return false unless File.exist?('/etc/os-release')
       os_info = File.read('/etc/os-release')
-      os_info.include?("ubuntu")
+      os_info.include?("ubuntu") || os_info.include?("debian")
     end
 
     def mac?
