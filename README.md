@@ -85,7 +85,7 @@ You can start multiple instances of redis in parallel by rotating
 
 ## Log information
 All log will be available at log/redis.PORT.log
-The default log level is `debug`, which will dump a lot of log.
+The default log level is `warning` to minimize logging overhead during tests.
 Customize your loglevel by setting RedisTest.loglevel to `debug`, `verbose`,
 `notice` or `warning`. See https://raw.githubusercontent.com/antirez/redis/2.8/redis.conf for explanation regarding redis log level
 ## Contributing
