@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'redis_test/version'
+require 'fileutils'
 require 'socket'
 
 module RedisTest
@@ -34,27 +35,34 @@ module RedisTest
     end
 
     def loglevel
-      @loglevel || 'debug'
+      @loglevel || 'warning'
     end
 
     attr_writer :loglevel
 
-    def start(log_to_stdout: false)
+    def start(log_to_stdout: false, redis_options: {})
       FileUtils.mkdir_p cache_path
       FileUtils.mkdir_p pids_path
       FileUtils.mkdir_p logs_path
 
-      redis_options = {
+      default_redis_options = {
         'pidfile' => pidfile,
         'port' => port,
         'timeout' => 300,
         'dbfilename' => db_filename,
         'dir' => cache_path,
         'loglevel' => loglevel,
-        'databases' => 16
+        'databases' => 16,
+        'save' => '""',
+        'appendonly' => 'no',
+        'maxclients' => 10_000
       }
 
-      redis_options['logfile'] = logfile unless log_to_stdout
+      default_redis_options['logfile'] = logfile unless log_to_stdout
+      redis_options = redis_options.each_with_object({}) do |(key, value), options|
+        options[key.to_s] = value
+      end
+      redis_options = default_redis_options.merge(redis_options)
 
       redis_options_str = redis_options.map { |k, v| "#{k} #{v}" }.join('\n')
       echo_command = mac? || ubuntu? ? 'echo' : 'echo -e'
